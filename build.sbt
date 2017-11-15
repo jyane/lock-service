@@ -25,7 +25,12 @@ val protoSettings = Seq(
   )
 )
 
+lazy val domain = (project in file("modules/domain"))
+  .settings(commonSettings)
+  .settings(protoSettings)
+
 lazy val app = (project in file("modules/app"))
   .settings(commonSettings)
   .settings(protoSettings)
+  .dependsOn(domain)
   .enablePlugins(JavaServerAppPackaging)
