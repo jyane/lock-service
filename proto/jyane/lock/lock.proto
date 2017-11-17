@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package jyane.lock;
+
+import "google/protobuf/duration.proto";
+
+message TryAcquireRequest {
+  string owner = 1;
+  string key = 2;
+  google.protobuf.Duration duration = 3;
+}
+
+message TryAcquireResponse {
+  google.protobuf.Duration duration = 1;
+}
+
+message ReleaseRequest {
+  string owner = 1;
+  string key = 2;
+}
+
+message ReleaseResponse {
+}
+
+service LockService {
+  rpc TryAcquire(TryAcquireRequest) returns (TryAcquireResponse) {}
+  rpc Release(ReleaseRequest) returns (ReleaseResponse) {}
+}

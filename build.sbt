@@ -10,7 +10,12 @@ val defaultScalacOptions = Seq(
 
 val commonSettings = Seq(
   scalaVersion := "2.12.4",
-  scalacOptions ++= defaultScalacOptions
+  scalacOptions ++= defaultScalacOptions,
+  libraryDependencies ++= Seq(
+    "com.typesafe" % "config" % "1.3.2",
+    "ch.qos.logback" % "logback-classic" % "1.2.3",
+    "com.typesafe.scala-logging" %% "scala-logging" % "3.7.1"
+  )
 )
 
 val protoSettings = Seq(
@@ -31,6 +36,5 @@ lazy val domain = (project in file("modules/domain"))
 
 lazy val app = (project in file("modules/app"))
   .settings(commonSettings)
-  .settings(protoSettings)
   .dependsOn(domain)
   .enablePlugins(JavaServerAppPackaging)
