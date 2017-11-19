@@ -8,7 +8,7 @@ import io.grpc.{ManagedChannel, Status, StatusRuntimeException}
 import io.grpc.util.MutableHandlerRegistry
 import jp.jyane.lock.testutil.WithServer
 import jp.jyane.lock.{Channels, LockConfig}
-import jyane.lock.{TryAcquireRequest, TryAcquireResponse}
+import jyane.lock.{ReleaseRequest, ReleaseResponse, TryAcquireRequest, TryAcquireResponse}
 import mvccpb.KeyValue
 import org.mockito.Mockito
 import org.scalatest.mockito.MockitoSugar
@@ -139,6 +139,83 @@ class LockServiceImplTest extends org.scalatest.WordSpec with MockitoSugar {
         val request = TryAcquireRequest(owner = "jyane", key = "foo", duration = Some(Duration(seconds = 0L)))
         val response = intercept[StatusRuntimeException] {
           Await.result(lockService.tryAcquire(request), 1.seconds)
+        }
+        assert(response.getStatus.getCode === Status.INVALID_ARGUMENT.getCode)
+      }
+      ()
+    })
+  }
+
+  "release" should {
+    "returns OK" in new WithServer({ (registry, channel) =>
+      new Setup(registry, channel) {
+        Mockito
+          .when(kvImpl.range(RangeRequest(key = ByteString.copyFromUtf8("/lock/jyane/bar"))))
+          .thenReturn(Future.successful(RangeResponse(kvs = Seq(KeyValue()))))
+        Mockito
+          .when(kvImpl.deleteRange(DeleteRangeRequest(key = ByteString.copyFromUtf8("/lock/jyane/bar"))))
+          .thenReturn(Future.successful(DeleteRangeResponse(deleted = 1L)))
+
+        val request = ReleaseRequest(owner = "jyane", key = "bar")
+        val response = Await.result(lockService.release(request), 1.seconds)
+        assert(response === ReleaseResponse())
+      }
+      ()
+    })
+
+    "returns FAILED_PRECONDITION when the key does not exist" in new WithServer({ (registry, channel) =>
+      new Setup(registry, channel) {
+        Mockito
+          .when(kvImpl.range(RangeRequest(key = ByteString.copyFromUtf8("/lock/jyane/bar"))))
+          .thenReturn(Future.successful(RangeResponse()))
+
+        val request = ReleaseRequest(owner = "jyane", key = "bar")
+        val response = intercept[StatusRuntimeException] {
+          Await.result(lockService.release(request), 1.seconds)
+        }
+        assert(response.getStatus.getCode === Status.FAILED_PRECONDITION.getCode)
+      }
+      ()
+    })
+
+    "returns INVALID_ARGUMENT when key is empty" in new WithServer({ (registry, channel) =>
+      new Setup(registry, channel) {
+        val request = ReleaseRequest(owner = "jyane", key = "")
+        val response = intercept[StatusRuntimeException] {
+          Await.result(lockService.release(request), 1.seconds)
+        }
+        assert(response.getStatus.getCode === Status.INVALID_ARGUMENT.getCode)
+      }
+      ()
+    })
+
+    "returns INVALID_ARGUMENT when key length is larger than 255" in new WithServer({ (registry, channel) =>
+      new Setup(registry, channel) {
+        val request = ReleaseRequest(owner = "jyane", key = Strings.repeat("a", 256))
+        val response = intercept[StatusRuntimeException] {
+          Await.result(lockService.release(request), 1.seconds)
+        }
+        assert(response.getStatus.getCode === Status.INVALID_ARGUMENT.getCode)
+      }
+      ()
+    })
+
+    "returns INVALID_ARGUMENT when owner is empty" in new WithServer({ (registry, channel) =>
+      new Setup(registry, channel) {
+        val request = ReleaseRequest(owner = "", key = "bar")
+        val response = intercept[StatusRuntimeException] {
+          Await.result(lockService.release(request), 1.seconds)
+        }
+        assert(response.getStatus.getCode === Status.INVALID_ARGUMENT.getCode)
+      }
+      ()
+    })
+
+    "returns INVALID_ARGUMENT when owner length is larger than 256" in new WithServer({ (registry, channel) =>
+      new Setup(registry, channel) {
+        val request = ReleaseRequest(owner = Strings.repeat("a", 256), key = "bar")
+        val response = intercept[StatusRuntimeException] {
+          Await.result(lockService.release(request), 1.seconds)
         }
         assert(response.getStatus.getCode === Status.INVALID_ARGUMENT.getCode)
       }

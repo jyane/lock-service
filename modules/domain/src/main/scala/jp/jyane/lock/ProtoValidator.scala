@@ -1,7 +1,7 @@
 package jp.jyane.lock
 
 import com.google.protobuf.duration.Duration
-import jyane.lock.TryAcquireRequest
+import jyane.lock.{ReleaseRequest, TryAcquireRequest}
 
 import scalaz.ValidationNel
 import scalaz.syntax.validation._
@@ -31,6 +31,15 @@ object ProtoValidator {
       ProtoValidator.validateDuration(request.getDuration, 60L * 60L)
     ) { case (owner, key, duration) =>
       TryAcquireRequest(owner, key, Some(duration))
+    }
+  }
+
+  def validateRelaseRequest(request: ReleaseRequest): ValidationNel[String, ReleaseRequest] = {
+    (
+      ProtoValidator.validateStringLength("owner", request.owner, 256) |@|
+      ProtoValidator.validateStringLength("key", request.key, 256)
+    ) { case (owner, key) =>
+      ReleaseRequest(owner, key)
     }
   }
 }

@@ -5,7 +5,7 @@ import com.google.protobuf.duration.Duration
 import etcdserverpb._
 import io.grpc.Status
 import jp.jyane.lock._
-import jp.jyane.lock.exception.{AlreadyExistsException, InvalidArgumentException}
+import jp.jyane.lock.exception.{AlreadyExistsException, FailedPreconditionException, InvalidArgumentException}
 import jyane.lock._
 
 import scala.concurrent.Future
@@ -59,7 +59,29 @@ trait LockServiceImpl extends LockServiceGrpc.LockService with UseChannels with 
   }
 
   override def release(request: ReleaseRequest): Future[ReleaseResponse] = {
-    ???
+    for {
+      validatedRequest <- ProtoValidator.validateRelaseRequest(request) match {
+        case Success(s) => Future.successful(s)
+        case Failure(s) => Future.failed(InvalidArgumentException(s.toString()))
+      }
+      key = ByteString.copyFromUtf8(s"/lock/${validatedRequest.owner}/${validatedRequest.key}")
+      rangeResponse <- kv.range(RangeRequest(key = key))
+      _ <- if (rangeResponse.kvs.isEmpty) {
+        Future.failed(FailedPreconditionException("key does not exist"))
+      } else {
+        Future.successful(())
+      }
+      _ <- kv.deleteRange(DeleteRangeRequest(key = key))
+    } yield {
+      ReleaseResponse()
+    }
+  }.recover {
+    case e: FailedPreconditionException =>
+      throw Status.FAILED_PRECONDITION.withDescription(e.getMessage).asRuntimeException()
+    case e: InvalidArgumentException =>
+      throw Status.INVALID_ARGUMENT.withDescription(e.getMessage).asRuntimeException()
+    case NonFatal(_) =>
+      throw Status.INTERNAL.asRuntimeException()
   }
 }
 
