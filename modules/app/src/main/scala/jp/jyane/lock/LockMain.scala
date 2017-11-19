@@ -2,6 +2,7 @@ package jp.jyane.lock
 
 import com.typesafe.scalalogging.StrictLogging
 import io.grpc.ServerBuilder
+import io.grpc.protobuf.services.ProtoReflectionService
 import jp.jyane.lock.service.MixinLockService
 import jyane.lock.LockServiceGrpc
 
@@ -9,6 +10,7 @@ object LockMain extends MixinLockService with MixinChannels with MixinLockConfig
   private[this] lazy val server = ServerBuilder
     .forPort(lockConfig.serverConfig.port)
     .addService(LockServiceGrpc.bindService(lockService, executionContext))
+    .addService(ProtoReflectionService.newInstance())
     .build()
 
   def onStart(): Unit = {
