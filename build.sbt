@@ -14,7 +14,10 @@ val commonSettings = Seq(
   libraryDependencies ++= Seq(
     "com.typesafe" % "config" % "1.3.2",
     "ch.qos.logback" % "logback-classic" % "1.2.3",
-    "com.typesafe.scala-logging" %% "scala-logging" % "3.7.1"
+    "com.typesafe.scala-logging" %% "scala-logging" % "3.7.1",
+    "org.scalaz" %% "scalaz-core" % "7.2.16",
+    "org.scalatest" %% "scalatest" % "3.0.3" % "test",
+    "org.mockito" % "mockito-core" % "2.12.0" % "test"
   )
 )
 
