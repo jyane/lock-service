@@ -17,7 +17,7 @@ object ProtoValidator {
   }
 
   def validateDuration(duration: Duration, limit: Long): ValidationNel[String, Duration] = {
-    if (0 < duration.seconds && duration.seconds <= 60 * 60) {
+    if (0 < duration.seconds && duration.seconds < limit) {
       duration.successNel
     } else {
       s"duration must be 0 < seconds <= $limit".failureNel
@@ -28,7 +28,7 @@ object ProtoValidator {
     (
       ProtoValidator.validateStringLength("owner", request.owner, 256) |@|
       ProtoValidator.validateStringLength("key", request.key, 256) |@|
-      ProtoValidator.validateDuration(request.getDuration, 60L * 60L)
+      ProtoValidator.validateDuration(request.getDuration, 60L * 60L + 1)
     ) { case (owner, key, duration) =>
       TryAcquireRequest(owner, key, Some(duration))
     }

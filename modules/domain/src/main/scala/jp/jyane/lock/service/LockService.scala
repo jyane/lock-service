@@ -39,7 +39,7 @@ trait LockServiceImpl extends LockServiceGrpc.LockService with UseChannels with 
         Future.successful(())
       }
       leaseGrantResponse <- lease.leaseGrant(LeaseGrantRequest(tTL = validatedRequest.getDuration.seconds))
-      putResponse <- kv.put(
+      _ <- kv.put(
         PutRequest(
           key = key,
           value = ByteString.copyFrom(Array[Byte](1)),
@@ -54,7 +54,7 @@ trait LockServiceImpl extends LockServiceGrpc.LockService with UseChannels with 
       throw Status.ALREADY_EXISTS.withDescription(e.getMessage).asRuntimeException()
     case e: InvalidArgumentException =>
       throw Status.INVALID_ARGUMENT.withDescription(e.getMessage).asRuntimeException()
-    case NonFatal(e) =>
+    case NonFatal(_) =>
       throw Status.INTERNAL.asRuntimeException()
   }
 

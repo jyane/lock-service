@@ -5,7 +5,7 @@ import io.grpc.ServerBuilder
 import jp.jyane.lock.service.MixinLockService
 import jyane.lock.LockServiceGrpc
 
-object LockMain extends MixinLockService with MixinLockConfig with MixinExecutionContext with StrictLogging {
+object LockMain extends MixinLockService with MixinChannels with MixinLockConfig with MixinExecutionContext with StrictLogging {
   private[this] lazy val server = ServerBuilder
     .forPort(lockConfig.serverConfig.port)
     .addService(LockServiceGrpc.bindService(lockService, executionContext))
@@ -19,6 +19,7 @@ object LockMain extends MixinLockService with MixinLockConfig with MixinExecutio
 
   def onStop(): Unit = {
     logger.info("shutdown.")
+    channels.etcdChannel.shutdown()
     server.shutdown()
     ()
   }
