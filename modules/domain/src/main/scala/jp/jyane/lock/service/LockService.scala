@@ -2,6 +2,7 @@ package jp.jyane.lock.service
 
 import com.google.protobuf.ByteString
 import com.google.protobuf.duration.Duration
+import com.typesafe.scalalogging.StrictLogging
 import etcdserverpb._
 import io.grpc.Status
 import jp.jyane.lock._
@@ -21,7 +22,7 @@ trait LockService {
   def release(request: ReleaseRequest): Future[ReleaseResponse]
 }
 
-trait LockServiceImpl extends LockServiceGrpc.LockService with UseChannels with UseExecutionContext {
+trait LockServiceImpl extends LockServiceGrpc.LockService with UseChannels with StrictLogging with UseExecutionContext {
   def kv: KVGrpc.KVStub = KVGrpc.stub(channel = channels.etcdChannel)
   def lease: LeaseGrpc.LeaseStub = LeaseGrpc.stub(channel = channels.etcdChannel)
 
@@ -54,7 +55,8 @@ trait LockServiceImpl extends LockServiceGrpc.LockService with UseChannels with 
       throw Status.ALREADY_EXISTS.withDescription(e.getMessage).asRuntimeException()
     case e: InvalidArgumentException =>
       throw Status.INVALID_ARGUMENT.withDescription(e.getMessage).asRuntimeException()
-    case NonFatal(_) =>
+    case NonFatal(e) =>
+      logger.error("internal error", e)
       throw Status.INTERNAL.asRuntimeException()
   }
 
@@ -80,7 +82,8 @@ trait LockServiceImpl extends LockServiceGrpc.LockService with UseChannels with 
       throw Status.FAILED_PRECONDITION.withDescription(e.getMessage).asRuntimeException()
     case e: InvalidArgumentException =>
       throw Status.INVALID_ARGUMENT.withDescription(e.getMessage).asRuntimeException()
-    case NonFatal(_) =>
+    case NonFatal(e) =>
+      logger.error("internal error", e)
       throw Status.INTERNAL.asRuntimeException()
   }
 }
