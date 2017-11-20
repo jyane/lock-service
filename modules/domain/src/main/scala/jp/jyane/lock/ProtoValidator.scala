@@ -24,7 +24,7 @@ object ProtoValidator {
     }
   }
 
-  def validateTryAcqureRequest(request: TryAcquireRequest): ValidationNel[String, TryAcquireRequest] = {
+  def validateTryAcquireRequest(request: TryAcquireRequest): ValidationNel[String, TryAcquireRequest] = {
     (
       ProtoValidator.validateStringLength("owner", request.owner, 256) |@|
       ProtoValidator.validateStringLength("key", request.key, 256) |@|
@@ -34,7 +34,7 @@ object ProtoValidator {
     }
   }
 
-  def validateRelaseRequest(request: ReleaseRequest): ValidationNel[String, ReleaseRequest] = {
+  def validateReleaseRequest(request: ReleaseRequest): ValidationNel[String, ReleaseRequest] = {
     (
       ProtoValidator.validateStringLength("owner", request.owner, 256) |@|
       ProtoValidator.validateStringLength("key", request.key, 256)

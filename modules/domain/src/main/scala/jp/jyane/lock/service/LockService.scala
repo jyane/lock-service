@@ -27,7 +27,7 @@ trait LockServiceImpl extends LockServiceGrpc.LockService with UseChannels with 
 
   override def tryAcquire(request: TryAcquireRequest): Future[TryAcquireResponse] = {
     for {
-      validatedRequest <- ProtoValidator.validateTryAcqureRequest(request) match {
+      validatedRequest <- ProtoValidator.validateTryAcquireRequest(request) match {
         case Success(s) => Future.successful(s)
         case Failure(s) => Future.failed(InvalidArgumentException(s.toString()))
       }
@@ -60,7 +60,7 @@ trait LockServiceImpl extends LockServiceGrpc.LockService with UseChannels with 
 
   override def release(request: ReleaseRequest): Future[ReleaseResponse] = {
     for {
-      validatedRequest <- ProtoValidator.validateRelaseRequest(request) match {
+      validatedRequest <- ProtoValidator.validateReleaseRequest(request) match {
         case Success(s) => Future.successful(s)
         case Failure(s) => Future.failed(InvalidArgumentException(s.toString()))
       }
