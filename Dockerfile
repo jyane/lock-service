@@ -1,0 +1,7 @@
+FROM gcr.io/distroless/java
+
+ADD app-0.1-SNAPSHOT /app
+ADD conf /app/conf
+WORKDIR /app
+
+ENTRYPOINT ["/usr/bin/java", "-classpath", "/app/lib/*", "jp.jyane.lock.LockMain"]
