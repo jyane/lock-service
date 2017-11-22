@@ -8,6 +8,10 @@ trait UseChannels {
 }
 
 trait Channels extends UseLockConfig {
+  def etcdChannel: ManagedChannel
+}
+
+object DefaultChannels extends Channels with MixinLockConfig {
   lazy val etcdChannel: ManagedChannel = NettyChannelBuilder
     .forAddress(lockConfig.etcdConfig.address, lockConfig.etcdConfig.port)
     .usePlaintext(true)
@@ -15,5 +19,5 @@ trait Channels extends UseLockConfig {
 }
 
 trait MixinChannels {
-  val channels = new Channels with MixinLockConfig
+  val channels: Channels = DefaultChannels
 }
