@@ -9,6 +9,6 @@ steps:
     args: ['app-0.1-SNAPSHOT.zip']
 
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/$PROJECT_ID/lock-service:v0.0.1', '.']
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/lock-service', '.']
 
-images: ['gcr.io/$PROJECT_ID/lock-service:v0.0.1']
+images: ['gcr.io/$PROJECT_ID/lock-service:$TAG_NAME']
