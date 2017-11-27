@@ -27,6 +27,7 @@ val protoSettings = Seq(
   ),
   PB.protoSources in Compile += file("proto"),
   libraryDependencies ++= Seq(
+    "com.google.protobuf" % "protobuf-java" % com.trueaccord.scalapb.compiler.Version.protobufVersion % "protobuf",
     "io.grpc" % "grpc-netty" % com.trueaccord.scalapb.compiler.Version.grpcJavaVersion,
     "io.grpc" % "grpc-services" % com.trueaccord.scalapb.compiler.Version.grpcJavaVersion,
     "com.trueaccord.scalapb" %% "scalapb-runtime" % com.trueaccord.scalapb.compiler.Version.scalapbVersion,
