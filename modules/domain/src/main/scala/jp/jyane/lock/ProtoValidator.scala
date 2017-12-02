@@ -28,7 +28,7 @@ object ProtoValidator {
     (
       ProtoValidator.validateStringLength("owner", request.owner, 256) |@|
       ProtoValidator.validateStringLength("key", request.key, 256) |@|
-      ProtoValidator.validateDuration(request.getDuration, 60L * 60L + 1)
+      ProtoValidator.validateDuration(request.getDuration, 24L * 60L * 60L + 1)
     ) { case (owner, key, duration) =>
       TryAcquireRequest(owner, key, Some(duration))
     }

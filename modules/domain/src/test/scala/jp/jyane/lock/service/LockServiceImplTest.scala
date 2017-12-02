@@ -123,9 +123,9 @@ class LockServiceImplTest extends org.scalatest.WordSpec with MockitoSugar {
       ()
     })
 
-    "returns INVALID_ARGUMENT when duration is larger than 60 minutes" in new WithServer({ (registry, channel) =>
+    "returns INVALID_ARGUMENT when duration is larger than 24 hours" in new WithServer({ (registry, channel) =>
       new Setup(registry, channel) {
-        val request = TryAcquireRequest(owner = "jyane", key = "foo", duration = Some(Duration(seconds = 60L * 60L + 1L)))
+        val request = TryAcquireRequest(owner = "jyane", key = "foo", duration = Some(Duration(seconds = 24L * 60L * 60L + 1L)))
         val response = intercept[StatusRuntimeException] {
           Await.result(lockService.tryAcquire(request), 1.seconds)
         }

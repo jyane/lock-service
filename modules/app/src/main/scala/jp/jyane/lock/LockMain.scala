@@ -1,7 +1,7 @@
 package jp.jyane.lock
 
 import com.typesafe.scalalogging.StrictLogging
-import io.grpc.{ServerBuilder, ServerInterceptor, ServerInterceptors}
+import io.grpc.{ServerBuilder, ServerInterceptors}
 import io.grpc.protobuf.services.ProtoReflectionService
 import jp.jyane.lock.service.MixinLockService
 import jp.jyane.lock.interceptor.LoggingInterceptor
