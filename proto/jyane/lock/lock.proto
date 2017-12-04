@@ -4,6 +4,16 @@ package jyane.lock;
 
 import "google/protobuf/duration.proto";
 
+message AcquireRequest {
+  string owner = 1;
+  string key = 2;
+  google.protobuf.Duration duration = 3;
+}
+
+message AcquireResponse {
+  google.protobuf.Duration duration = 1;
+}
+
 message TryAcquireRequest {
   // owner is the owner, length of owner must be less than 256.
   string owner = 1;
@@ -30,6 +40,12 @@ message ReleaseResponse {
 }
 
 service LockService {
+  // Acquire acquires a lock, if lock was already exists, waits for the release.
+  rpc Acquire(AcquireRequest) returns (stream AcquireResponse) {}
+
+  // TryAcquire acqires a lock immediately, if lock was already exists, returns an error immediately.
   rpc TryAcquire(TryAcquireRequest) returns (TryAcquireResponse) {}
+
+  // Release release a lock immediately.
   rpc Release(ReleaseRequest) returns (ReleaseResponse) {}
 }

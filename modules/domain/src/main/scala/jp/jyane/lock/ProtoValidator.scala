@@ -1,7 +1,7 @@
 package jp.jyane.lock
 
 import com.google.protobuf.duration.Duration
-import jyane.lock.{ReleaseRequest, TryAcquireRequest}
+import jyane.lock.{AcquireRequest, ReleaseRequest, TryAcquireRequest}
 
 import scalaz.ValidationNel
 import scalaz.syntax.validation._
@@ -20,7 +20,17 @@ object ProtoValidator {
     if (0 < duration.seconds && duration.seconds < limit) {
       duration.successNel
     } else {
-      s"duration must be 0 < seconds <= $limit".failureNel
+      s"duration must be 0 < seconds < $limit".failureNel
+    }
+  }
+
+  def validateAcquireRequest(request: AcquireRequest): ValidationNel[String, AcquireRequest] = {
+    (
+      ProtoValidator.validateStringLength("owner", request.owner, 256) |@|
+        ProtoValidator.validateStringLength("key", request.key, 256) |@|
+        ProtoValidator.validateDuration(request.getDuration, 24L * 60L * 60L + 1)
+    ) { case (owner, key, duration) =>
+      AcquireRequest(owner, key, Some(duration))
     }
   }
 
