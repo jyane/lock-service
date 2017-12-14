@@ -23,23 +23,26 @@ trait LockService {
 }
 
 trait LockServiceImpl extends LockServiceGrpc.LockService with UseChannels with StrictLogging with UseExecutionContext {
-  def kv: KVGrpc.KVStub = KVGrpc.stub(channel = channels.etcdChannel)
-  def lease: LeaseGrpc.LeaseStub = LeaseGrpc.stub(channel = channels.etcdChannel)
+  val kv: KVGrpc.KVStub = KVGrpc.stub(channel = channels.etcdChannel)
+  val lease: LeaseGrpc.LeaseStub = LeaseGrpc.stub(channel = channels.etcdChannel)
+
+  def generateKey(owner: String, key: String): ByteString =
+    ByteString.copyFromUtf8(s"/lock/$owner/$key")
 
   override def tryAcquire(request: TryAcquireRequest): Future[TryAcquireResponse] = {
     for {
-      validatedRequest <- ProtoValidator.validateTryAcquireRequest(request) match {
+      _ <- ProtoValidator.validateTryAcquireRequest(request) match {
         case Success(s) => Future.successful(s)
         case Failure(s) => Future.failed(InvalidArgumentException(s.toString()))
       }
-      key = ByteString.copyFromUtf8(s"/lock/${validatedRequest.owner}/${validatedRequest.key}")
+      key = generateKey(request.owner, request.key)
       rangeResponse <- kv.range(RangeRequest(key = key))
       _ <- if (rangeResponse.kvs.nonEmpty) {
         Future.failed(AlreadyExistsException("key already exists"))
       } else {
         Future.successful(())
       }
-      leaseGrantResponse <- lease.leaseGrant(LeaseGrantRequest(tTL = validatedRequest.getDuration.seconds))
+      leaseGrantResponse <- lease.leaseGrant(LeaseGrantRequest(tTL = request.getDuration.seconds))
       _ <- kv.put(
         PutRequest(
           key = key,
@@ -62,11 +65,11 @@ trait LockServiceImpl extends LockServiceGrpc.LockService with UseChannels with 
 
   override def release(request: ReleaseRequest): Future[ReleaseResponse] = {
     for {
-      validatedRequest <- ProtoValidator.validateReleaseRequest(request) match {
+      _ <- ProtoValidator.validateReleaseRequest(request) match {
         case Success(s) => Future.successful(s)
         case Failure(s) => Future.failed(InvalidArgumentException(s.toString()))
       }
-      key = ByteString.copyFromUtf8(s"/lock/${validatedRequest.owner}/${validatedRequest.key}")
+      key = generateKey(request.owner, request.key)
       rangeResponse <- kv.range(RangeRequest(key = key))
       _ <- if (rangeResponse.kvs.isEmpty) {
         Future.failed(FailedPreconditionException("key does not exist"))
