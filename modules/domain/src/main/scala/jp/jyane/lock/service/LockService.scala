@@ -23,8 +23,8 @@ trait LockService {
 }
 
 trait LockServiceImpl extends LockServiceGrpc.LockService with UseChannels with StrictLogging with UseExecutionContext {
-  val kv: KVGrpc.KVStub = KVGrpc.stub(channel = channels.etcdChannel)
-  val lease: LeaseGrpc.LeaseStub = LeaseGrpc.stub(channel = channels.etcdChannel)
+  lazy val kv: KVGrpc.KVStub = KVGrpc.stub(channel = channels.etcdChannel)
+  lazy val lease: LeaseGrpc.LeaseStub = LeaseGrpc.stub(channel = channels.etcdChannel)
 
   def generateKey(owner: String, key: String): ByteString =
     ByteString.copyFromUtf8(s"/lock/$owner/$key")
