@@ -63,7 +63,7 @@ sh etcd.sh
 ### Start application
 
 ``` sh
-sbt run
+sbt app/run
 ```
 
 ### Call service via grpc_cli
