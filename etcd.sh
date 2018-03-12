@@ -2,7 +2,7 @@ docker run \
   -d \
   -p 2379:2379 \
   -p 2380:2380 \
-  --name etcd-v3.2.9 \
+  --name etcd-v3.3.2 \
   --volume=${HOME}/workspace/tmp/etcd:/etcd-data \
   gcr.io/etcd-development/etcd:v3.2.9 \
   /usr/local/bin/etcd \
