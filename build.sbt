@@ -9,7 +9,7 @@ val defaultScalacOptions = Seq(
 )
 
 val commonSettings = Seq(
-  scalaVersion := "2.12.4",
+  scalaVersion := "2.12.5",
   scalacOptions ++= defaultScalacOptions,
   libraryDependencies ++= Seq(
     "com.typesafe" % "config" % "1.3.2",
