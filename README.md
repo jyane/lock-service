@@ -5,7 +5,7 @@ Lock Service provides a lock service via gRPC.
 
 ## Proto
 
-```
+```proto
 syntax = "proto3";
 
 package jyane.lock;
