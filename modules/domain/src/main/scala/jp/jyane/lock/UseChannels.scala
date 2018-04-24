@@ -1,7 +1,7 @@
 package jp.jyane.lock
 
 import io.grpc.ManagedChannel
-import io.grpc.netty.NettyChannelBuilder
+import io.grpc.ManagedChannelBuilder
 
 trait UseChannels {
   def channels: Channels
@@ -12,9 +12,9 @@ trait Channels extends UseLockConfig {
 }
 
 object DefaultChannels extends Channels with MixinLockConfig {
-  lazy val etcdChannel: ManagedChannel = NettyChannelBuilder
+  lazy val etcdChannel: ManagedChannel = ManagedChannelBuilder
     .forAddress(lockConfig.etcdConfig.address, lockConfig.etcdConfig.port)
-    .usePlaintext(true)
+    .usePlaintext()
     .build()
 }
 
