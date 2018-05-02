@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package jyane.lock;
+
+message ServerConfig {
+  int32 port = 1;
+}
+
+message EtcdConfig {
+  string address = 1;
+  int32 port = 2;
+}
+
+message LockConfig {
+  ServerConfig server_config = 1;
+  EtcdConfig etcd_config = 2;
+}

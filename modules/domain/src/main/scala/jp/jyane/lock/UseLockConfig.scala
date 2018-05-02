@@ -1,24 +1,16 @@
 package jp.jyane.lock
 
-import java.io.File
-
-import com.typesafe.config.ConfigFactory
-
-case class ServerConfig(port: Int)
-
-case class EtcdConfig(address: String, port: Int)
+import jyane.lock.LockConfig
+import scalapb.TextFormat
 
 trait UseLockConfig {
   def lockConfig: LockConfig
 }
 
-case class LockConfig(serverConfig: ServerConfig, etcdConfig: EtcdConfig)
-
 trait MixinLockConfig {
-  private[this] val config = ConfigFactory.parseFile(new File("conf/app.conf"))
-
-  val lockConfig = LockConfig(
-    ServerConfig(config.getInt("server.port")),
-    EtcdConfig(config.getString("etcd.address"), config.getInt("etcd.port"))
-  )
+  val lockConfig: LockConfig =
+    TextFormat.fromAscii(LockConfig, scala.io.Source.fromFile("conf/lock_config.pb.txt").mkString) match {
+      case Right(x) => x
+      case Left(x) => throw new RuntimeException(s"failed to load the config: ${x}")
+    }
 }

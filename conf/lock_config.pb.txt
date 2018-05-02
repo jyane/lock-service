@@ -1,0 +1,8 @@
+server_config {
+  port: 10080
+}
+
+etcd_config {
+  address: "localhost"
+  port: 2379
+}

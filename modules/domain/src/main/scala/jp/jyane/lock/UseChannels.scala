@@ -13,7 +13,7 @@ trait Channels extends UseLockConfig {
 
 object DefaultChannels extends Channels with MixinLockConfig {
   lazy val etcdChannel: ManagedChannel = ManagedChannelBuilder
-    .forAddress(lockConfig.etcdConfig.address, lockConfig.etcdConfig.port)
+    .forAddress(lockConfig.getEtcdConfig.address, lockConfig.getEtcdConfig.port)
     .usePlaintext()
     .build()
 }

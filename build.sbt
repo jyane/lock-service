@@ -12,7 +12,6 @@ val commonSettings = Seq(
   scalaVersion := "2.12.6",
   scalacOptions ++= defaultScalacOptions,
   libraryDependencies ++= Seq(
-    "com.typesafe" % "config" % "1.3.2",
     "ch.qos.logback" % "logback-classic" % "1.2.3",
     "com.typesafe.scala-logging" %% "scala-logging" % "3.7.1",
     "org.scalaz" %% "scalaz-core" % "7.2.16",
@@ -25,7 +24,7 @@ val protoSettings = Seq(
   PB.targets in Compile := Seq(
     scalapb.gen(flatPackage = true) -> (sourceManaged in Compile).value
   ),
-  PB.protoSources in Compile += file("proto"),
+  PB.protoSources in Compile := Seq(file("proto")),
   libraryDependencies ++= Seq(
     "com.google.protobuf" % "protobuf-java" % scalapb.compiler.Version.protobufVersion % "protobuf",
     "io.grpc" % "grpc-netty" % scalapb.compiler.Version.grpcJavaVersion,

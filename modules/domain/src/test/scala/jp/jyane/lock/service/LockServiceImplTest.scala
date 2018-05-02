@@ -7,8 +7,8 @@ import etcdserverpb._
 import io.grpc.{ManagedChannel, Status, StatusRuntimeException}
 import io.grpc.util.MutableHandlerRegistry
 import jp.jyane.lock.testutil.WithServer
-import jp.jyane.lock.{Channels, LockConfig}
-import jyane.lock.{ReleaseRequest, ReleaseResponse, TryAcquireRequest, TryAcquireResponse}
+import jp.jyane.lock.Channels
+import jyane.lock._
 import mvccpb.KeyValue
 import org.mockito.Mockito
 import org.scalatest.mockito.MockitoSugar

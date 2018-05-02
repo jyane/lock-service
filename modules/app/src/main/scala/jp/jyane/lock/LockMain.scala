@@ -9,13 +9,13 @@ import jyane.lock.LockServiceGrpc
 
 object LockMain extends MixinLockService with MixinChannels with MixinLockConfig with MixinExecutionContext with StrictLogging {
   private[this] lazy val server = ServerBuilder
-    .forPort(lockConfig.serverConfig.port)
+    .forPort(lockConfig.getServerConfig.port)
     .addService(ServerInterceptors.intercept(LockServiceGrpc.bindService(lockService, executionContext), new LoggingInterceptor))
     .addService(ProtoReflectionService.newInstance())
     .build()
 
   def onStart(): Unit = {
-    logger.info(s"server start. port: ${lockConfig.serverConfig.port}")
+    logger.info(s"server start. port: ${lockConfig.getServerConfig.port}")
     server.start()
     server.awaitTermination()
   }
