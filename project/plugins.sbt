@@ -3,4 +3,4 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "1.3.2")
 
 resolvers += Resolver.sbtPluginRepo("releases")
 
-libraryDependencies += "com.thesamet.scalapb" %% "compilerplugin" % "0.7.2"
+libraryDependencies += "com.thesamet.scalapb" %% "compilerplugin" % "0.7.4"
