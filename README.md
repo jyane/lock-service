@@ -45,14 +45,6 @@ service LockService {
 
 ## Usage
 
-### Edit the config
-
-```
-etcd {
-  address = localhost
-}
-```
-
 
 ### Run etcd by docker
 
